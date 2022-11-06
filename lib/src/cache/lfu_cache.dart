@@ -1,13 +1,23 @@
-part of dcache;
+part of cache;
 
-class LfuCache<K, V> extends SimpleCache<K, V> {
-  LfuCache({required Storage<K, V> storage, OnEvict<K, V>? onEvict})
-      : super(storage: storage, onEvict: onEvict);
+class LfuCache<K extends Comparable, V extends Object?>
+    extends Cache<LfuStorage<K, V>, LfuCacheEntry<K, V>, K, V> {
+  LfuCache({
+    required super.storage,
+    super.onEvict,
+  });
 
   @override
   List<CacheEntry<K, V>> _collectGarbage(int size) {
-    var values = _internalStorage.values;
-    values.sort((a, b) => a.use.compareTo(b.use));
-    return values.take(size).toList();
+    final entries = _internalStorage.entries;
+    entries.sort((a, b) => a.use.compareTo(b.use));
+    return entries.take(size).toList();
   }
+
+  @override
+  LfuCacheEntry<K, V> _getCacheElement(K key, V? value, DateTime insertTime) =>
+      LfuCacheEntry<K, V>(key, value, insertTime);
+
+  @override
+  void _onCacheEntryAccessed(LfuCacheEntry<K, V>? entry) => entry?.use++;
 }

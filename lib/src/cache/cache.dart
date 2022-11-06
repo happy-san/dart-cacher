@@ -1,36 +1,74 @@
-part of dcache;
+/// The MIT License (MIT)
+///
+/// Original work Copyright (c) 2015 Jun Kimura
+/// Modified work Copyright (c) 2022 Harpreet Sangar
+///
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+///
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions of the Software.
+///
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+/// THE SOFTWARE.
+
+library cache;
+
+import 'dart:async';
+
+import '../cache_entry/cache_entry.dart';
+import '../storage/storage.dart';
+
+part 'simple_cache.dart';
+part 'lru_cache.dart';
+part 'tlru_cache.dart';
+part 'lfu_cache.dart';
 
 typedef LoaderFunc<K, V> = FutureOr<V> Function(K key, V? oldValue);
 typedef OnEvict<K, V> = void Function(K k, V? v);
 
-abstract class Cache<K, V> {
+abstract class Cache<S extends Storage<C, K, V>, C extends CacheEntry<K, V>,
+    K extends Comparable, V extends Object?> {
   /// if onEvict is set that method is called whenever an entry is removed from the queue.
   /// At the time the method is called the entry is already removed.
-  OnEvict<K, V>? onEvict;
-  Storage<K, V> _internalStorage;
+  final OnEvict<K, V>? _onEvict;
+  S _internalStorage;
   LoaderFunc<K, V>? _loaderFunc;
+
+  /// Set when every [CacheEntry] of [Storage] has the same expiry duration.
   Duration? _expiration;
 
   /// Determine if the loading function in case of "refreshing", would be waited or not
   /// In some case we are more interested by the quick answer than a accurate one
   bool _syncValueReloading;
 
-  Cache(Storage<K, V> storage, {this.onEvict})
+  Cache({required S storage, OnEvict<K, V>? onEvict, Duration? expiration})
       : _internalStorage = storage,
-        _syncValueReloading = true;
+        _syncValueReloading = true,
+        _onEvict = onEvict,
+        _expiration = expiration;
 
   /// return the element identify by [key]
   V? get(K key) {
     if (_loaderFunc != null && !containsKey(key)) {
       if (_internalStorage.length >= _internalStorage.capacity) {
-        var garbage = _collectGarbage(
+        final garbage = _collectGarbage(
             _internalStorage.length - _internalStorage.capacity + 1);
-        if (onEvict != null) {
-          for (var e in garbage) {
-            onEvict!(e.key, e.value);
+        if (_onEvict != null) {
+          for (final e in garbage) {
+            _onEvict!(e.key, e.value);
           }
         }
-        for (var e in garbage) {
+        for (final e in garbage) {
           _internalStorage.remove(e.key);
         }
       }
@@ -53,12 +91,13 @@ abstract class Cache<K, V> {
       }
     }
 
-    entry?.use++;
-    entry?.updateUseTime();
+    _onCacheEntryAccessed(entry);
     return entry?.value;
   }
 
-  // Load a new value and insert in the cache
+  void _onCacheEntryAccessed(C? entry) {}
+
+  // Load a  value and insert in the cache
   void _loadValue(CacheEntry<K, V> entry) {
     if (_loaderFunc != null && !entry.updating) {
       entry.updating = true;
@@ -75,31 +114,33 @@ abstract class Cache<K, V> {
   }
 
   /// internal [get]
-  CacheEntry<K, V>? _get(K key) => _internalStorage[key];
+  C? _get(K key) => _internalStorage[key];
 
   /// add [element] in the cache at [key]
-  Cache<K, V> set(K key, V element) {
+  Cache<S, C, K, V> set(K key, V element) {
     return _set(key, element);
   }
 
+  C _getCacheElement(K key, V? value, DateTime insertTime);
+
   /// internal [set]
-  Cache<K, V> _set(K key, FutureOr<V> element) {
-    CacheEntry<K, V> entry;
+  Cache<S, C, K, V> _set(K key, FutureOr<V> element) {
+    late final C entry;
     if (element is Future<V>) {
-      entry = CacheEntry<K, V>(key, null, DateTime.now());
+      entry = _getCacheElement(key, null, DateTime.now());
       entry.updating = true;
       element.then((e) {
         entry.updating = false;
         entry.value = e;
       });
     } else {
-      entry = CacheEntry<K, V>(key, element, DateTime.now());
+      entry = _getCacheElement(key, element, DateTime.now());
     }
     _internalStorage[key] = entry;
     return this;
   }
 
-  /// clear elements to let new element being inserted
+  /// clear elements to let  element being inserted
   List<CacheEntry<K, V>> _collectGarbage(int size);
 
   /// return the number of element in the cache
@@ -125,7 +166,7 @@ abstract class Cache<K, V> {
     _loaderFunc = loadFunc;
   }
 
-  set storage(Storage<K, V> storage) {
+  set storage(S storage) {
     _internalStorage = storage;
   }
 
@@ -135,5 +176,14 @@ abstract class Cache<K, V> {
 
   set syncLoading(bool syncLoading) {
     _syncValueReloading = syncLoading;
+  }
+
+  V? remove(K key) {
+    if (_internalStorage.containsKey(key)) {
+      final value = _internalStorage[key]!.value;
+      _internalStorage.remove(key);
+      return value;
+    }
+    return null;
   }
 }

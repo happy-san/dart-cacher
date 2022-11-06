@@ -1,5 +1,16 @@
-include: package:pedantic/analysis_options.yaml
+include: package:lints/recommended.yaml
 analyzer:
   strong-mode:
-    implicit-casts: false
-    implicit-dynamic: false
+    implicit-casts: true
+    implicit-dynamic: true
+
+linter:
+  rules:
+    prefer_final_locals: true
+    avoid_null_checks_in_equality_operators: true
+    avoid_redundant_argument_values: true
+    unnecessary_statements: true
+    unnecessary_lambdas: true 
+    unnecessary_new: true 
+    unnecessary_this: true 
+    unnecessary_null_checks: true 

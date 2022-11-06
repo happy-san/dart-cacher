@@ -1,15 +1,15 @@
 import 'package:test/test.dart';
-import 'package:dcache/dcache.dart';
+import 'package:cache/cache.dart';
 
 void main() {
   const expiry = Duration(seconds: 1, milliseconds: 500);
   const interval = Duration(milliseconds: 500);
   const halfInterval = Duration(milliseconds: 250);
   const evictionOrder = ['b', 'a'];
+  var evictionCounter = 0;
 
   late TlruCache<int, String> cache;
-  final pause = ({Duration? delay}) => Future<void>.delayed(delay ?? interval);
-  var evictionCounter = 0;
+  pause({Duration? delay}) => Future<void>.delayed(delay ?? interval);
 
   setUp(() {
     cache = TlruCache<int, String>(

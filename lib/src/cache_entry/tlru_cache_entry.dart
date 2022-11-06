@@ -1,12 +1,16 @@
-part of dcache;
+part of cache_entry;
 
-class TlruCacheEntry<K, V> extends CacheEntry<K, V> {
-  Duration expiration;
+class TlruCacheEntry<K extends Comparable, V extends Object?>
+    extends LruCacheEntry<K, V> {
+  TlruCacheEntry(super.key, super.value, super.insertTime, Duration expiration)
+      : _expiration = expiration;
+
+  final Duration _expiration;
 
   static bool hasExpired(TlruCacheEntry entry) =>
-      DateTime.now().difference(entry.insertTime) > entry.expiration;
+      DateTime.now().difference(entry.insertTime) > entry._expiration;
 
-  int compare(TlruCacheEntry other) {
+  int compareExpirationTo(TlruCacheEntry other) {
     final thisExpired = hasExpired(this);
     final otherExpired = hasExpired(other);
 
@@ -20,7 +24,4 @@ class TlruCacheEntry<K, V> extends CacheEntry<K, V> {
       return 0;
     }
   }
-
-  TlruCacheEntry(K key, V? value, DateTime insertTime, this.expiration)
-      : super(key, value, insertTime);
 }

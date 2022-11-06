@@ -1,13 +1,24 @@
-part of dcache;
+part of cache;
 
-class LruCache<K, V> extends SimpleCache<K, V> {
-  LruCache({required Storage<K, V> storage, OnEvict<K, V>? onEvict})
-      : super(storage: storage, onEvict: onEvict);
+class LruCache<K extends Comparable, V extends Object?>
+    extends Cache<LruStorage<K, V>, LruCacheEntry<K, V>, K, V> {
+  LruCache({
+    required super.storage,
+    super.onEvict,
+  });
 
   @override
   List<CacheEntry<K, V>> _collectGarbage(int size) {
-    var values = _internalStorage.values;
-    values.sort((a, b) => a.lastUse.compareTo(b.lastUse));
-    return values.take(size).toList();
+    final entries = _internalStorage.entries;
+    entries.sort((a, b) => a.lastUse.compareTo(b.lastUse));
+    return entries.take(size).toList();
   }
+
+  @override
+  LruCacheEntry<K, V> _getCacheElement(K key, V? value, DateTime insertTime) =>
+      LruCacheEntry<K, V>(key, value, insertTime);
+
+  @override
+  void _onCacheEntryAccessed(LruCacheEntry<K, V>? entry) =>
+      entry?.updateUseTime();
 }
