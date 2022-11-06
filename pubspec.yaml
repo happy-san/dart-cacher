@@ -1,8 +1,8 @@
-name: cache
+name: cacher
 version: 0.1.0
 description: Implementations of common cache replacement algorithms.
-repository: https://github.com/happy-san/dart-cache
-issue_tracker: https://github.com/happy-san/dart-cache/issues
+repository: https://github.com/happy-san/dart-cacher
+issue_tracker: https://github.com/happy-san/dart-cacher/issues
 
 environment:
   sdk: ">=2.17.5 <3.0.0"

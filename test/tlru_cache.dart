@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:cache/cache.dart';
+import 'package:cacher/cacher.dart';
 
 void main() {
   const expiry = Duration(seconds: 1, milliseconds: 500);

@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 import 'dart:io';
 
-import 'package:cache/cache.dart';
+import 'package:cacher/cacher.dart';
 
 void main() {
   test('Test cache initialization', () {

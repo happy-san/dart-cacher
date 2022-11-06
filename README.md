@@ -1,8 +1,8 @@
 > This is a modification of https://github.com/platelk/dcache, licensed under the MIT License.
 
-# Cache
+# Cacher
 
-Cache is a simple library to implement application caching in `dart` inspired by [gcache](https://github.com/bluele/gcache)
+Cacher is a simple library to implement application caching in `dart` inspired by [gcache](https://github.com/bluele/gcache)
 
 ## Features
 
@@ -17,7 +17,7 @@ Cache is a simple library to implement application caching in `dart` inspired by
 ### Simple use case
 
 ```dart
-import 'package:cache/cache.dart';
+import 'package:cacher/cacher.dart';
 
 void main() {
   Cache c = SimpleCache(storage: SimpleStorage(20));
@@ -32,7 +32,7 @@ void main() {
 ### Add logic on eviction.
 
 ```dart
-import 'package:cache/cache.dart';
+import 'package:cacher/cacher.dart';
 
 void main() {
   Cache c = SimpleCache<Key, Disposable>(
@@ -46,7 +46,7 @@ void main() {
 ### Loading function
 
 ```dart
-import 'package:cache/cache.dart';
+import 'package:cacher/cacher.dart';
 
 void main() {
   Cache c = SimpleCache<int, int>(
