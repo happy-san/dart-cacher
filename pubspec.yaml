@@ -1,5 +1,5 @@
 name: cacher
-version: 0.1.0
+version: 0.1.1
 description: Implementations of common cache replacement algorithms. Includes LRU, TLRU, LFU.
 repository: https://github.com/happy-san/dart-cacher
 issue_tracker: https://github.com/happy-san/dart-cacher/issues
