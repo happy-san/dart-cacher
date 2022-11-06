@@ -21,4 +21,18 @@ class LruCache<K extends Comparable, V extends Object?>
   @override
   void _onCacheEntryAccessed(LruCacheEntry<K, V>? entry) =>
       entry?.updateUseTime();
+
+  @override
+  List<LruCacheEntry<K, V>> get entries {
+    final entries = _internalStorage.entries;
+    entries.sort((a, b) {
+      int i = a.lastUse.compareTo(b.lastUse);
+      if (i != 0) {
+        i = -i;
+      }
+
+      return i;
+    });
+    return entries;
+  }
 }

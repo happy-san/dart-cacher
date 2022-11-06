@@ -35,7 +35,8 @@ abstract class Storage<C extends CacheEntry<K, V>, K extends Comparable,
     V extends Object?> {
   Storage(
     int size,
-  ) : _size = size;
+  )   : _size = size,
+        assert(size > 0);
 
   final int _size;
 

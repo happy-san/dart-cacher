@@ -35,4 +35,9 @@ abstract class CacheEntry<K extends Comparable, V extends Object?> {
   V? value;
   bool updating = false;
   final DateTime insertTime;
+
+  @override
+  String toString() {
+    return '{$key, $value}';
+  }
 }

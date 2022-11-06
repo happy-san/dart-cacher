@@ -18,4 +18,8 @@ class SimpleCache<K extends Comparable, V extends Object?>
   SimpleCacheEntry<K, V> _getCacheElement(
           K key, V? value, DateTime insertTime) =>
       SimpleCacheEntry<K, V>(key, value, insertTime);
+
+  @override
+  List<SimpleCacheEntry<K, V>> get entries =>
+      List.from(_internalStorage.entries);
 }

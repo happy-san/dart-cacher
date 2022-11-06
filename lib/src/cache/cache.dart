@@ -170,6 +170,8 @@ abstract class Cache<S extends Storage<C, K, V>, C extends CacheEntry<K, V>,
     _internalStorage = storage;
   }
 
+  List<C> get entries;
+
   set expiration(Duration duration) {
     _expiration = duration;
   }

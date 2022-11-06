@@ -64,7 +64,7 @@ void main() {
 *Kevin PLATEL*
 
 * mail : <platel.kevin@gmail.com>
-* github : <http://github.com/platelk>
+* github : <https://github.com/platelk>
 * twitter : <https://twitter.com/kevinplatel>
 
 *Harpreet Sangar*
