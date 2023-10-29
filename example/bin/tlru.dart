@@ -15,8 +15,8 @@ Future<void> tlruExample() async {
   for (int i = 0; i < insertions.length; i++) {
     final insertion = insertions[i];
 
-    cache.get(insertion);
     print('get $insertion.');
+    cache.get(insertion);
     printCache(cache);
 
     if (delays[i]) {

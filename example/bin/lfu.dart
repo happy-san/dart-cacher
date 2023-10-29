@@ -11,8 +11,8 @@ void lfuExample() {
   print('\nLfuCache size 3');
 
   for (final insertion in insertions) {
-    cache.get(insertion);
     print('get $insertion.');
+    cache.get(insertion);
     printCache(cache);
   }
 }

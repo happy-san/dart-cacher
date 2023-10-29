@@ -74,14 +74,25 @@ abstract class Cache<S extends Storage<C, K, V>, C extends CacheEntry<K, V>,
       }
       _loadFirstValue(key);
     }
+
     var entry = _get(key);
     if (entry == null) {
       return null;
     }
 
-    // Check if the value hasn't expired
+    _onCacheEntryAccessed(entry);
+
     if (_expiration != null &&
         DateTime.now().difference(entry.insertTime) >= _expiration!) {
+      if (_loaderFunc == null) {
+        remove(key);
+        if (_onEvict != null) {
+          _onEvict!(entry.key, entry.value);
+        }
+        return null;
+      }
+
+      // The value has expired, loading the latest value.
       if (_syncValueReloading) {
         _loadValue(entry);
         entry = _get(key);
@@ -91,7 +102,6 @@ abstract class Cache<S extends Storage<C, K, V>, C extends CacheEntry<K, V>,
       }
     }
 
-    _onCacheEntryAccessed(entry);
     return entry?.value;
   }
 

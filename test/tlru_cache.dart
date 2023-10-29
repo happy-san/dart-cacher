@@ -29,6 +29,15 @@ void main() {
 
   test('Evicts expired and least recently used entries; in that order',
       () async {
+    //
+    //    250    250    250    250    250    250     (ms)
+    //  |------|------|------|------|------|-------|
+    // a,b   c,a,d         c,d,a           d       e
+    //
+    //  |------|------|------|------|------|-------|
+    //  b(1.5) d(1.5)        a(0.75)       d(0.5)  e(1.5)
+    //  a(1.5) a(1.25)       d(1)          a(0.25) d(0.25)
+    //         c(1.5)        c(1)          c(0.5)  c(0.25)
     cache.get(0);
     cache.get(1);
     await pause(delay: halfInterval);
@@ -47,5 +56,20 @@ void main() {
     await pause(delay: halfInterval);
 
     cache.get(4); // Evict 'a' (expired).
+  });
+
+  test('Returns null on value expired when no _loaderFunc is provided',
+      () async {
+    final _cache = TlruCache<int, String>(
+      storage: TlruStorage(3),
+      expiration: expiry,
+      onEvict: (key, value) => print('evicting {$value}'),
+    );
+
+    _cache.set(0, 'a');
+    await pause(delay: expiry);
+
+    final value = _cache.get(0);
+    expect(value, isNull);
   });
 }
