@@ -15,7 +15,8 @@ class LfuCache<K extends Comparable, V extends Object?>
   }
 
   @override
-  LfuCacheEntry<K, V> _getCacheElement(K key, V? value, DateTime insertTime) =>
+  LfuCacheEntry<K, V> _getCacheElement(K key, V? value, DateTime insertTime,
+          {Duration? expiration}) =>
       LfuCacheEntry<K, V>(key, value, insertTime);
 
   @override

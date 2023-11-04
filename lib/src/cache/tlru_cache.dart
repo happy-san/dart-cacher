@@ -17,12 +17,17 @@ class TlruCache<K extends Comparable, V extends Object?>
   }
 
   @override
-  TlruCacheEntry<K, V> _getCacheElement(K key, V? value, DateTime insertTime) =>
-      TlruCacheEntry<K, V>(key, value, insertTime, _expiration!);
+  TlruCacheEntry<K, V> _getCacheElement(K key, V? value, DateTime insertTime,
+          {Duration? expiration}) =>
+      TlruCacheEntry<K, V>(
+          key, value, insertTime, expiration ?? _commonExpiration!);
 
   @override
   void _onCacheEntryAccessed(LruCacheEntry<K, V>? entry) =>
       entry?.updateUseTime();
+
+  @override
+  bool _hasExpired(TlruCacheEntry<K, V> entry) => entry.hasExpired();
 
   @override
   List<TlruCacheEntry<K, V>> get entries {

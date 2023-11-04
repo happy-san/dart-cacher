@@ -15,8 +15,8 @@ class SimpleCache<K extends Comparable, V extends Object?>
   }
 
   @override
-  SimpleCacheEntry<K, V> _getCacheElement(
-          K key, V? value, DateTime insertTime) =>
+  SimpleCacheEntry<K, V> _getCacheElement(K key, V? value, DateTime insertTime,
+          {Duration? expiration}) =>
       SimpleCacheEntry<K, V>(key, value, insertTime);
 
   @override

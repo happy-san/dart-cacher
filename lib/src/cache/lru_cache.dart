@@ -15,7 +15,8 @@ class LruCache<K extends Comparable, V extends Object?>
   }
 
   @override
-  LruCacheEntry<K, V> _getCacheElement(K key, V? value, DateTime insertTime) =>
+  LruCacheEntry<K, V> _getCacheElement(K key, V? value, DateTime insertTime,
+          {Duration? expiration}) =>
       LruCacheEntry<K, V>(key, value, insertTime);
 
   @override

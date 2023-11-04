@@ -45,7 +45,7 @@ abstract class Cache<S extends Storage<C, K, V>, C extends CacheEntry<K, V>,
   LoaderFunc<K, V>? _loaderFunc;
 
   /// Set when every [CacheEntry] of [Storage] has the same expiry duration.
-  Duration? _expiration;
+  Duration? _commonExpiration;
 
   /// Determine if the loading function in case of "refreshing", would be waited or not
   /// In some case we are more interested by the quick answer than a accurate one
@@ -55,7 +55,7 @@ abstract class Cache<S extends Storage<C, K, V>, C extends CacheEntry<K, V>,
       : _internalStorage = storage,
         _syncValueReloading = true,
         _onEvict = onEvict,
-        _expiration = expiration;
+        _commonExpiration = expiration;
 
   /// return the element identify by [key]
   V? get(K key) {
@@ -82,8 +82,7 @@ abstract class Cache<S extends Storage<C, K, V>, C extends CacheEntry<K, V>,
 
     _onCacheEntryAccessed(entry);
 
-    if (_expiration != null &&
-        DateTime.now().difference(entry.insertTime) >= _expiration!) {
+    if (_hasExpired(entry)) {
       if (_loaderFunc == null) {
         remove(key);
         if (_onEvict != null) {
@@ -107,6 +106,11 @@ abstract class Cache<S extends Storage<C, K, V>, C extends CacheEntry<K, V>,
 
   void _onCacheEntryAccessed(C? entry) {}
 
+  bool _hasExpired(C entry) {
+    return _commonExpiration != null &&
+        DateTime.now().difference(entry.insertTime) >= _commonExpiration!;
+  }
+
   // Load a  value and insert in the cache
   void _loadValue(CacheEntry<K, V> entry) {
     if (_loaderFunc != null && !entry.updating) {
@@ -127,24 +131,27 @@ abstract class Cache<S extends Storage<C, K, V>, C extends CacheEntry<K, V>,
   C? _get(K key) => _internalStorage[key];
 
   /// add [element] in the cache at [key]
-  Cache<S, C, K, V> set(K key, V element) {
-    return _set(key, element);
+  Cache<S, C, K, V> set(K key, V element, {Duration? expiration}) {
+    return _set(key, element, expiration: expiration);
   }
 
-  C _getCacheElement(K key, V? value, DateTime insertTime);
+  C _getCacheElement(K key, V? value, DateTime insertTime,
+      {Duration? expiration});
 
   /// internal [set]
-  Cache<S, C, K, V> _set(K key, FutureOr<V> element) {
+  Cache<S, C, K, V> _set(K key, FutureOr<V> element, {Duration? expiration}) {
     late final C entry;
     if (element is Future<V>) {
-      entry = _getCacheElement(key, null, DateTime.now());
+      entry =
+          _getCacheElement(key, null, DateTime.now(), expiration: expiration);
       entry.updating = true;
       element.then((e) {
         entry.updating = false;
         entry.value = e;
       });
     } else {
-      entry = _getCacheElement(key, element, DateTime.now());
+      entry = _getCacheElement(key, element, DateTime.now(),
+          expiration: expiration);
     }
     _internalStorage[key] = entry;
     return this;
@@ -183,7 +190,7 @@ abstract class Cache<S extends Storage<C, K, V>, C extends CacheEntry<K, V>,
   List<C> get entries;
 
   set expiration(Duration duration) {
-    _expiration = duration;
+    _commonExpiration = duration;
   }
 
   set syncLoading(bool syncLoading) {

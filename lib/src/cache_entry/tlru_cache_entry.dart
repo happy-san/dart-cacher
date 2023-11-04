@@ -2,17 +2,15 @@ part of cache_entry;
 
 class TlruCacheEntry<K extends Comparable, V extends Object?>
     extends LruCacheEntry<K, V> {
-  TlruCacheEntry(super.key, super.value, super.insertTime, Duration expiration)
-      : _expiration = expiration;
+  TlruCacheEntry(super.key, super.value, super.insertTime, this._expiration);
 
   final Duration _expiration;
 
-  static bool hasExpired(TlruCacheEntry entry) =>
-      DateTime.now().difference(entry.insertTime) > entry._expiration;
+  bool hasExpired() => DateTime.now().difference(insertTime) > _expiration;
 
   int compareExpirationTo(TlruCacheEntry other) {
-    final thisExpired = hasExpired(this);
-    final otherExpired = hasExpired(other);
+    final thisExpired = this.hasExpired();
+    final otherExpired = other.hasExpired();
 
     if (thisExpired && otherExpired) {
       return 0;
