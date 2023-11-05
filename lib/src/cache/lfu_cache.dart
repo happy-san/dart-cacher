@@ -1,4 +1,4 @@
-part of cache;
+part of 'cache.dart';
 
 class LfuCache<K extends Comparable, V extends Object?>
     extends Cache<LfuStorage<K, V>, LfuCacheEntry<K, V>, K, V> {

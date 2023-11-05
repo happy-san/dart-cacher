@@ -1,4 +1,4 @@
-part of cache;
+part of 'cache.dart';
 
 class TlruCache<K extends Comparable, V extends Object?>
     extends Cache<TlruStorage<K, V>, TlruCacheEntry<K, V>, K, V> {

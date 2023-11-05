@@ -1,4 +1,4 @@
-part of cache_entry;
+part of 'cache_entry.dart';
 
 class SimpleCacheEntry<K extends Comparable, V extends Object?>
     extends CacheEntry<K, V> {

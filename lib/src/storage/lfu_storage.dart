@@ -1,9 +1,6 @@
-part of storage;
+part of 'storage.dart';
 
 class LfuStorage<K extends Comparable, V extends Object?>
     extends InMemoryStorage<LfuCacheEntry<K, V>, K, V> {
-  LfuStorage(
-    int size, {
-    Map<K, LfuCacheEntry<K, V>>? internalMap,
-  }) : super(size, internalMap: internalMap);
+  LfuStorage(super.size, {super.internalMap});
 }

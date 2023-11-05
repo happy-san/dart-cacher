@@ -1,4 +1,4 @@
-part of cache;
+part of 'cache.dart';
 
 /// SimpleCache is a basic cache implementation without any particular logic
 /// than appending keys in the storage, and remove first inserted keys when storage is full

@@ -1,5 +1,9 @@
+# 0.2.1
+* Fix linter warnings.
+* Update dev dependencies.
+
 # 0.2.0
-* Add optional `expiration` parameter in the `Cache.set` method. This only affects the `TlruCache` and when specified, this takes precedence over the common expiry duration.
+* Add optional `expiration` parameter in the `Cache.set` method. This only affects the `TlruCache` and when specified, this takes precedence over the common expiry duration. [#2](https://github.com/happy-san/dart-cacher/issues/2)
 
 # 0.1.2
 

@@ -1,4 +1,4 @@
-part of storage;
+part of 'storage.dart';
 
 class InMemoryStorage<C extends CacheEntry<K, V>, K extends Comparable,
     V extends Object?> extends Storage<C, K, V> {
